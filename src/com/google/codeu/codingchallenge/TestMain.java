@@ -64,7 +64,6 @@ final class TestMain {
        }
       });
     
-    
     tests.add("String many Values with white spaces", new Test() {
       @Override
       public void run(JSONFactory factory) throws Exception {
