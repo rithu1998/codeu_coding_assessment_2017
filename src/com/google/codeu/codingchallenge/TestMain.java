@@ -23,7 +23,7 @@ final class TestMain {
 
     final Tester tests = new Tester();
 
-    tests.add("Empty Object", new Test() {
+   tests.add("Empty Object", new Test() {
       @Override
       public void run(JSONFactory factory) throws Exception {
         final JSONParser parser = factory.parser();
@@ -40,16 +40,63 @@ final class TestMain {
         Asserts.isEqual(objects.size(), 0);
       }
     });
-
+    
     tests.add("String Value", new Test() {
+        @Override
+        public void run(JSONFactory factory) throws Exception {
+          final JSONParser parser = factory.parser();
+          final JSON obj = parser.parse("{ \"name\":\"sam doe\"}");
+
+         // Asserts.isEqual("sam doe", obj.getString("name"));
+          Asserts.isEqual("sam doe", obj.getString("name"));
+       }
+      });
+    
+    tests.add("String Value with all escapes", new Test() {
+        @Override
+        public void run(JSONFactory factory) throws Exception {
+          final JSONParser parser = factory.parser();
+          final JSON obj = parser.parse("{ \"nam\\\\\t\ne\":\"sam doe\"}");
+
+         // Asserts.isEqual("sam doe", obj.getString("name"));
+          Asserts.isEqual("sam doe", obj.getString("nam\\\t\ne"));
+       }
+      });
+    
+    
+    tests.add("String many Values with white spaces", new Test() {
       @Override
       public void run(JSONFactory factory) throws Exception {
         final JSONParser parser = factory.parser();
-        final JSON obj = parser.parse("{ \"name\":\"sam doe\" }");
+        final JSON obj = parser.parse("{         \"name\":\"sam doe\" , \"name2\":\"sam doe2\" , \"name2\":\"sam doe2\" , \"name2\":\"sam doe2\"              }");
 
-        Asserts.isEqual("sam doe", obj.getString("name"));
+       // Asserts.isEqual("sam doe", obj.getString("name"));
+        Asserts.isEqual("sam doe2", obj.getString("name2"));
      }
     });
+    
+    tests.add("String Values with no white spaces", new Test() {
+        @Override
+        public void run(JSONFactory factory) throws Exception {
+          final JSONParser parser = factory.parser();
+          final JSON obj = parser.parse("{\"name\":\"sam doe\",\"name2\":\"sam doe2\"}");
+
+         Asserts.isEqual("sam doe", obj.getString("name"));
+         // Asserts.isEqual("sam doe2", obj.getString("name2"));
+       }
+      });
+    
+    tests.add("String Values with extra } at end", new Test() {
+        @Override
+        public void run(JSONFactory factory) throws Exception {
+          final JSONParser parser = factory.parser();
+          final JSON obj = parser.parse("{\"name\":\"sam doe\",\"name2\":\"sam doe2\"}   }");
+
+         Asserts.isEqual("sam doe", obj.getString("name"));
+         // Asserts.isEqual("sam doe2", obj.getString("name2"));
+       }
+      });
+    
 
     tests.add("Object Value", new Test() {
       @Override
@@ -66,6 +113,41 @@ final class TestMain {
       }
     });
 
+    tests.add("Object Value & String value", new Test() {
+        @Override
+        public void run(JSONFactory factory) throws Exception {
+
+          final JSONParser parser = factory.parser();
+          final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" ,\"myfirst\":\"rithu\",\"mylast\":\"simha\"} }");
+
+          final JSON nameObj = obj.getObject("name");
+
+          Asserts.isNotNull(nameObj);
+          Asserts.isEqual("sam", nameObj.getString("first"));
+          Asserts.isEqual("doe", nameObj.getString("last"));
+          Asserts.isEqual("rithu", nameObj.getString("myfirst"));
+          Asserts.isEqual("simha", nameObj.getString("mylast"));
+        }
+      });
+    
+    tests.add("Two Object Values", new Test() {
+        @Override
+        public void run(JSONFactory factory) throws Exception {
+
+          final JSONParser parser = factory.parser();
+          final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\"} , \"name2\":{\"myfirst\":\"tom\", \"mylast\":\"smith\"} }");
+
+          final JSON nameObj = obj.getObject("name");
+          final JSON name2Obj = obj.getObject("name2");
+          
+          Asserts.isNotNull(nameObj);
+          Asserts.isEqual("sam", nameObj.getString("first"));
+          Asserts.isEqual("doe", nameObj.getString("last"));
+          Asserts.isEqual("tom", name2Obj.getString("myfirst"));
+          Asserts.isEqual("smith", name2Obj.getString("mylast"));
+        }
+      });
+    
     tests.run(new JSONFactory(){
       @Override
       public JSONParser parser() {
@@ -79,3 +161,4 @@ final class TestMain {
     });
   }
 }
+

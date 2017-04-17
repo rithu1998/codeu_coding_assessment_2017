@@ -14,41 +14,61 @@
 
 package com.google.codeu.codingchallenge;
 
-import java.util.Collection;
+
+import java.util.*;
 
 final class MyJSON implements JSON {
-
+  HashMap<String, String> hStrings = new HashMap<String, String>();
+  HashMap<String, JSON> hJSONObjects = new HashMap<String, JSON>();
+  
   @Override
   public JSON getObject(String name) {
     // TODO: implement this
-    return null;
+	JSON s = hJSONObjects.get(name);
+	if(s != null)
+		return s;
+	else
+		return null;
   }
 
   @Override
   public JSON setObject(String name, JSON value) {
     // TODO: implement this
+	hJSONObjects.put(name, value);
     return this;
   }
 
   @Override
   public String getString(String name) {
     // TODO: implement this
-    return null;
+	String s = hStrings.get(name);
+	if(s != null) 
+		return s;
+	else
+        return null;
   }
 
   @Override
   public JSON setString(String name, String value) {
     // TODO: implement this
+	hStrings.put(name, value);
     return this;
   }
 
   @Override
   public void getObjects(Collection<String> names) {
     // TODO: implement this
+	  for (String key : hJSONObjects.keySet()) {
+			names.add((hJSONObjects.get(key)).toString());
+	  }
+	  
   }
 
   @Override
   public void getStrings(Collection<String> names) {
     // TODO: implement this
+		for (String key : hStrings.keySet()) {
+			names.add(hStrings.get(key));
+		}
   }
 }
