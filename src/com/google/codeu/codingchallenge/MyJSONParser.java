@@ -16,23 +16,19 @@ package com.google.codeu.codingchallenge;
 
 import java.io.IOException;
 
-// trying something, may not be correct implementation
-
+/**
+ * @author rithusimha
+ * A simple JSON Parser for JSON objects
+ */
 final class MyJSONParser implements JSONParser {
 
 	private char[] buffer;
-	private int bufferOffset;
 	private int index;
 	
-	private char ch;
-	private StringBuilder captureBuffer;
+	private StringBuilder tempBuffer;
 
-	  
-	  
-  @Override
+	@Override
 	public JSON parse(String in) throws IOException {
-		// TODO: implement this
-	  
 		if (in == null)
 			throw new IOException("String in is null");
 		buffer = new char[in.length()];
@@ -41,15 +37,21 @@ final class MyJSONParser implements JSONParser {
 		}
 		this.index = 0;
 		
-		//return new MyJSON();
-		
 		return readJSONObject(in);
 	}
   
+    /**
+     * @param in
+     * @return JSON object
+     * @throws IOException
+     * 
+     * Method checks starting curly braces and also makes sure there 
+     * are no invalid characters at the end and calls readObject() to parse the string
+     */
     private JSON readJSONObject(String in) throws IOException {
     	JSON json;
 		skipSpace();
-		if(in.charAt(index) != '{') throw new IOException("Not a Valid JSON");
+		if(readChar() != '{') throw new IOException("Not a Valid JSON");
 		index++;
 		json = readObject();
 		skipSpace();
@@ -58,13 +60,20 @@ final class MyJSONParser implements JSONParser {
 		return json;
     }
     
+    /**
+     * @return JSON object
+     * @throws IOException
+     * 
+     * This method is called recursively in case there are objects within the JSON object
+     */
     private JSON readObject() throws IOException {
     	String key="";
     	String value="";
     	MyJSON json = new MyJSON();
     	skipSpace();
-    	char ch = readChar(); index++;
-    	if(ch == '}') {  // reached end of object;
+    	char ch = readChar(); 
+    	index++;
+    	if(ch == '}') {  // base case: reached end of object;
     		return json;
     	}
     	
@@ -72,7 +81,7 @@ final class MyJSONParser implements JSONParser {
     	switch(ch) {
     	case '"':
     			key = readString();
-    			System.out.println(key);
+    			//System.out.println(key);
     			skipSpace();
     			ch = readChar();
     			index++;
@@ -82,12 +91,12 @@ final class MyJSONParser implements JSONParser {
     			if(readChar() =='"') {
     				index++;
     				value = readString();
-    				System.out.println(value);
-    				json.setString(key,  value);
+    				//System.out.println(value);
+    				json.setString(key, value);
     				skipSpace();
     				ch = readChar();
     				index++;
-    			} else	if(readChar() =='{') {
+    			} else if(readChar() =='{') {
     				index++;
     				JSON j = readObject();
     				json.setObject(key, j);
@@ -106,6 +115,10 @@ final class MyJSONParser implements JSONParser {
    				ch = readChar();
    				index++;
     		   break;
+    	case '}':
+    		break;
+    	default:
+    		throw new IOException("Invalid JSON");
     	}
     	
     	} while ( (ch != '}'));
@@ -114,6 +127,10 @@ final class MyJSONParser implements JSONParser {
     	return json;
     }
 
+	/**
+	 * @return char
+	 * @throws IOException
+	 */
 	private char escapeStuff() throws IOException {
 
 		char ch = readChar();
@@ -136,31 +153,43 @@ final class MyJSONParser implements JSONParser {
 
 	}
 
+    /**
+     * @return char from the buffer at current index
+     * @throws IOException
+     */
     private char readChar() throws IOException{
-    	if(index >= buffer.length) throw new IOException("Invalid JSON");
+    	if(index >= buffer.length) throw new IOException("Exceded Buffer limit");
     	return buffer[index];
     }
     
+	/**
+	 * @return String
+	 * @throws IOException
+	 */
 	private String readString() throws IOException{
 		String ret = "";
-		captureBuffer = new StringBuilder();
+		tempBuffer = new StringBuilder();
 		while (readChar() != '"') {
 			switch (readChar()) {
 			case '\\':
 				index++;
-				captureBuffer.append(escapeStuff());
+				tempBuffer.append(escapeStuff());
 				index++;
 				break;
 			default:
-				captureBuffer.append(readChar());
+				tempBuffer.append(readChar());
 				index++;
 			}
 		}
-		ret = captureBuffer.toString();
+		ret = tempBuffer.toString();
 		index++;
 		return ret;
 	}
   
+    /**
+     * @throws IOException
+     * This method skips all the white spaces when called and increments the index
+     */
     private void skipSpace() throws IOException{
     	if(index == buffer.length) return;
     	while(isSpaceChar(readChar())) {
@@ -168,6 +197,10 @@ final class MyJSONParser implements JSONParser {
     	}
     }
   
+    /**
+     * @param ch
+     * @return boolean if ch is a white space including tab, CR, LF
+     */
     private boolean isSpaceChar(char ch) {
     	return ch == ' ' || ch == '\t' || ch == '\n' || ch =='\r';
     }

@@ -23,7 +23,6 @@ final class MyJSON implements JSON {
   
   @Override
   public JSON getObject(String name) {
-    // TODO: implement this
 	JSON s = hJSONObjects.get(name);
 	if(s != null)
 		return s;
@@ -33,14 +32,12 @@ final class MyJSON implements JSON {
 
   @Override
   public JSON setObject(String name, JSON value) {
-    // TODO: implement this
 	hJSONObjects.put(name, value);
     return this;
   }
 
   @Override
   public String getString(String name) {
-    // TODO: implement this
 	String s = hStrings.get(name);
 	if(s != null) 
 		return s;
@@ -50,14 +47,12 @@ final class MyJSON implements JSON {
 
   @Override
   public JSON setString(String name, String value) {
-    // TODO: implement this
 	hStrings.put(name, value);
     return this;
   }
 
   @Override
   public void getObjects(Collection<String> names) {
-    // TODO: implement this
 	  for (String key : hJSONObjects.keySet()) {
 			names.add((hJSONObjects.get(key)).toString());
 	  }
@@ -66,7 +61,6 @@ final class MyJSON implements JSON {
 
   @Override
   public void getStrings(Collection<String> names) {
-    // TODO: implement this
 		for (String key : hStrings.keySet()) {
 			names.add(hStrings.get(key));
 		}
